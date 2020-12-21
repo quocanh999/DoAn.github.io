@@ -1,0 +1,165 @@
+﻿@using BookStore.Models
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/Layout.cshtml";
+    double tongTien = 0;
+    var db = new BookContext();
+}
+@if (ViewBag.Err != null)
+{
+    <script type="text/javascript" charset="utf-8">
+        window.onload = function () {
+        alert("@ViewBag.Err");
+    }
+    </script>
+}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        font-family: sans-serif;
+    }
+
+    .GioHang {
+        width: 1200px;
+        height: auto;
+        margin: 20px auto;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09);
+    }
+
+    table {
+        width: 100%;
+        height: auto;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-collapse: collapse;
+    }
+
+        table th {
+            color: white;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #ddd;
+        }
+
+        table thead tr {
+            font-weight: bold;
+            background: #fcba68;
+            height: 50px;
+        }
+
+        table tbody tr td {
+            padding: 5px;
+        }
+
+            table tbody tr td img {
+                width: 75px;
+                height: 75px;
+            }
+
+            table tbody tr td a {
+                text-decoration: none;
+                color: black;
+            }
+
+        table tfoot tr {
+            height: 50px;
+        }
+</style>
+<div class="breadcrumb">
+    <div class="container">
+        <a class="breadcrumb-item" href="~/Home/Index">Trang chủ</a>
+        <span class="breadcrumb-item active">Giỏ hàng</span>
+    </div>
+</div>
+<div class="GioHang">
+    <table>
+        <thead>
+            <tr>
+
+                <th>Hình Ảnh</th>
+                <th>Tên Sách</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+                <th>Thành Tiền</th>
+                <th style="width: 300px;">Cập nhật</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @{
+                if (Session["cart"] != null)
+                {
+                  
+                    foreach (var item in (List<BookStore.Models.Item>)Session["cart"])
+                    {
+                        tongTien += item.sach.GiaBan * item.Quantity;
+
+                        <tr>
+                            <form method="post" action="~/GioHang/UpdateCart">
+                                <input type="hidden" name="id" value="@item.sach.MaSach"/>
+                                <td><img style="width: 80px;height: 120px;display: block;margin-left: auto; margin-right: auto;" src="~/UploadedFiles/@db.Sach.Find(item.sach.MaSach).AnhBia"></td>
+                                <td><p><a href="/ChiTietSach/Index/@item.sach.MaSach">@db.Sach.Find(item.sach.MaSach).TenSach</a></p></td>
+                                <td>@db.Sach.Find(item.sach.MaSach).GiaBan VNĐ</td>
+                                <td>
+                                    <input type="number" required name="quantity" value="@item.Quantity" style="width:50px;" />
+                                </td>
+                                <td>@(item.sach.GiaBan*item.Quantity) VNĐ</td>
+                                <td>
+                                    @Html.ActionLink("Xóa", "Remove", "GioHang", new { idCTHD = item.sach.MaSach }, new { })
+                                    <button type="submit">Sửa</button>
+                                </td>
+                            </form>
+                        </tr>
+
+                    }
+                } }
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4"></td>
+                <td>
+                    <h1>Thành tiền:</h1>
+                </td>
+                <td>
+                    @if (Session["cart"] != null)
+                    {
+                        <h1>@tongTien VNĐ</h1>
+                    }
+                    else
+                    {
+                        <h1>0 VNĐ</h1>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    @Html.ActionLink("Mua sắm nhiều hơn", "Index", "Home")
+
+                    </>
+                </td>
+                <td colspan="2"></td>
+                <td>
+                    <a href="/GioHang/Clear">
+                        <div>
+                            Xóa giỏ hàng
+                        </div>
+                    </a>
+                </td>
+                <td>
+                    <a href="/GioHang/ThanhToan">
+                        <h2>
+                            Tiếp tục đặt hàng
+                        </h2>
+                    </a>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+
